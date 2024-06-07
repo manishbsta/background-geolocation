@@ -103,7 +103,6 @@ class BackgroundGeolocationModule(reactContext: ReactApplicationContext) :
         override fun onActivityResult(
             activity: Activity?, requestCode: Int, resultCode: Int, data: Intent?
         ) {
-            Log.d("LocationService", "HERE!")
             if (requestCode == LOCATION_SERVICE_REQUEST_CODE) {
                 when (resultCode) {
                     Activity.RESULT_OK -> {
