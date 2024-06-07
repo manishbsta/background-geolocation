@@ -68,9 +68,9 @@ class BackgroundGeolocationModule(reactContext: ReactApplicationContext) :
 
     private fun enableGps() {
         // Create a LocationRequest with high accuracy
-        val locationRequest = LocationRequest.create().apply {
-            priority = Priority.PRIORITY_HIGH_ACCURACY
-        }
+        val locationRequest = LocationRequest.Builder(
+            Priority.PRIORITY_HIGH_ACCURACY, (SHORTEST_INTERVAL * 1000).toLong()
+        ).build()
 
         // Build a LocationSettingsRequest
         val builder = LocationSettingsRequest.Builder().addLocationRequest(locationRequest)
