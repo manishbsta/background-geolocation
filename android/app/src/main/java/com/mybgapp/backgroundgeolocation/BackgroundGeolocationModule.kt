@@ -33,6 +33,8 @@ class BackgroundGeolocationModule(reactContext: ReactApplicationContext) :
 
             if (!isGpsEnabled()) {
                 enableGps()
+            } else {
+                startService()
             }
         }
     }
@@ -41,7 +43,7 @@ class BackgroundGeolocationModule(reactContext: ReactApplicationContext) :
     fun stop() {
         Intent(reactApplicationContext, LocationService::class.java).apply {
             action = LocationService.ACTION_STOP
-            currentActivity?.startService(this)
+            reactApplicationContext.startService(this)
         }
     }
 
@@ -90,7 +92,7 @@ class BackgroundGeolocationModule(reactContext: ReactApplicationContext) :
                 try {
                     // Show the dialog by calling startResolutionForResult(), and check the result in onActivityResult()
                     exception.startResolutionForResult(
-                        currentActivity!!, LOCATION_SERVICE_REQUEST_CODE
+                        this.currentActivity!!, LOCATION_SERVICE_REQUEST_CODE
                     )
                 } catch (sendEx: IntentSender.SendIntentException) {
                     // Ignore the error
