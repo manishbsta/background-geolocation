@@ -7,7 +7,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.IBinder
-import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.modules.core.DeviceEventManagerModule
@@ -36,7 +35,6 @@ class LocationService : Service() {
         )
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         when (intent.action) {
             ACTION_START -> start(intent)
@@ -45,16 +43,20 @@ class LocationService : Service() {
         return super.onStartCommand(intent, flags, startId)
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     private fun start(intent: Intent) {
         val interval = intent.extras!!.getInt("interval")
 
         val notificationManager =
             getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        val channel = NotificationChannel(
-            NOTIFICATION_CHANNEL_ID, NOTIFICATION_CHANNEL_NAME, NotificationManager.IMPORTANCE_LOW
-        )
-        notificationManager.createNotificationChannel(channel)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                NOTIFICATION_CHANNEL_ID,
+                NOTIFICATION_CHANNEL_NAME,
+                NotificationManager.IMPORTANCE_LOW
+            )
+            notificationManager.createNotificationChannel(channel)
+        }
 
         val notification = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
             .setContentTitle("Tracking location")
