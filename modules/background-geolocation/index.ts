@@ -51,4 +51,5 @@ const BackgroundGeolocation = {
   },
 };
 
+export * from './types';
 export default BackgroundGeolocation;
