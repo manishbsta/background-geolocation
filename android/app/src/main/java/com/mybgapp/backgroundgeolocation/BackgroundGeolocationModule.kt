@@ -9,9 +9,11 @@ import android.content.IntentSender
 import android.location.LocationManager
 import android.util.Log
 import com.facebook.react.bridge.BaseActivityEventListener
+import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
+import com.facebook.react.bridge.WritableNativeMap
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
@@ -28,10 +30,10 @@ class BackgroundGeolocationModule(reactContext: ReactApplicationContext) :
 
     @ReactMethod
     fun start(intervalInSecs: Int) {
-        if (!isRunning()) {
+        if (!checkIfServiceIsRunning()) {
             INTERVAL_IN_SECS = intervalInSecs
 
-            if (!isGpsEnabled()) {
+            if (!checkIfGpsIsEnabled()) {
                 enableGps()
             } else {
                 startService()
@@ -48,19 +50,37 @@ class BackgroundGeolocationModule(reactContext: ReactApplicationContext) :
     }
 
     @ReactMethod
-    fun isRunning(): Boolean {
-        val am = reactApplicationContext.getSystemService(ACTIVITY_SERVICE) as ActivityManager
-        for (info in am.getRunningServices(Int.MAX_VALUE)) {
-            if (info.service.className == LocationService::class.java.name) {
-                return true
-            }
-        }
+    fun isRunning(promise: Promise) {
+        val isRunning = checkIfServiceIsRunning()
+        val status = WritableNativeMap()
 
-        return false
+        status.putBoolean("status", isRunning)
+        promise.resolve(status)
     }
 
     @ReactMethod
-    fun isGpsEnabled(): Boolean {
+    fun isGpsEnabled(promise: Promise) {
+        val isEnabled = checkIfGpsIsEnabled()
+        val status = WritableNativeMap()
+
+        status.putBoolean("status", isEnabled)
+        promise.resolve(status)
+    }
+
+    private fun checkIfServiceIsRunning(): Boolean {
+        var isRunning = false;
+
+        val am = reactApplicationContext.getSystemService(ACTIVITY_SERVICE) as ActivityManager
+        for (info in am.getRunningServices(Int.MAX_VALUE)) {
+            if (info.service.className == LocationService::class.java.name) {
+                isRunning = true
+            }
+        }
+
+        return isRunning
+    }
+
+    private fun checkIfGpsIsEnabled(): Boolean {
         val locationManager =
             reactApplicationContext.getSystemService(Context.LOCATION_SERVICE) as LocationManager
         val isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
