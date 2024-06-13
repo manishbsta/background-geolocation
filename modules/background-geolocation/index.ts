@@ -13,25 +13,26 @@ const {BackgroundGeolocation: BackgroundGeolocationModule, ModuleWithEmitter} =
 const eventEmitter = new NativeEventEmitter(ModuleWithEmitter);
 
 const BackgroundGeolocation = {
-  start: async (interval: number = 10) => {
+  start: async function (interval: number = 10) {
     const results = await PermissionsAndroid.requestMultiple([
       PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
       PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
     ]);
 
     if (
-      results['android.permission.ACCESS_FINE_LOCATION'] === 'granted' ||
+      results['android.permission.ACCESS_FINE_LOCATION'] === 'granted' &&
       results['android.permission.POST_NOTIFICATIONS'] === 'granted'
     ) {
       await BackgroundGeolocationModule.start(interval);
+    } else if (
+      results['android.permission.ACCESS_FINE_LOCATION'] === 'never_ask_again'
+    ) {
+      this.start(interval);
     } else {
       Alert.alert(
         'Permissions Denied',
-        'You must provide the following permissions:\n1.Notification\n2.Location',
-        [
-          {text: 'Cancel'},
-          {text: 'Allow', onPress: () => Linking.openSettings},
-        ],
+        'You must provide the following permissions:\n\n1. Notification\n2. Precise Location',
+        [{text: 'Cancel'}, {text: 'Allow', onPress: Linking.openSettings}],
       );
     }
   },
