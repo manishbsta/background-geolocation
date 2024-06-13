@@ -1,8 +1,9 @@
 import React, {useEffect, useState} from 'react';
 import {Button, FlatList, StyleSheet, Text, View} from 'react-native';
 
-import BackgroundGeolocation from './modules/background-geolocation';
-import {LatLang} from './modules/background-geolocation/types';
+import BackgroundGeolocation, {
+  type LatLang,
+} from './modules/background-geolocation';
 
 const App = () => {
   const [coords, setCoords] = useState<Array<LatLang>>([]);
