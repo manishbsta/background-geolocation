@@ -1,29 +1,16 @@
 import React, {useEffect, useState} from 'react';
-import {
-  Button,
-  FlatList,
-  NativeEventEmitter,
-  NativeModules,
-  PermissionsAndroid,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import {Button, FlatList, StyleSheet, Text, View} from 'react-native';
 
-import {LatLang} from './modules/BackgroundGeolocation/types';
-
-const {BackgroundGeolocation, ModuleWithEmitter} = NativeModules;
-const eventEmitter = new NativeEventEmitter(ModuleWithEmitter);
+import BackgroundGeolocation from './modules/background-geolocation';
+import {LatLang} from './modules/background-geolocation/types';
 
 const App = () => {
   const [coords, setCoords] = useState<Array<LatLang>>([]);
 
   useEffect(() => {
-    const onLocation = (latlng: LatLang) => {
+    const subscription = BackgroundGeolocation.onLocation((latlng: LatLang) => {
       setCoords(cd => [...cd, latlng]);
-    };
-
-    const subscription = eventEmitter.addListener('onLocation', onLocation);
+    });
 
     return () => {
       subscription.remove();
@@ -31,11 +18,6 @@ const App = () => {
   }, []);
 
   const startTrackingLocationBg = async () => {
-    await PermissionsAndroid.requestMultiple([
-      PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
-      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-    ]);
-
     await BackgroundGeolocation.start(10); //seconds
   };
 
