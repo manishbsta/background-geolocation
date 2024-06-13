@@ -38,7 +38,7 @@ const BackgroundGeolocation = {
   stop: async () => {
     await BackgroundGeolocationModule.stop();
   },
-  onLocation: (onLocation: (latLng: LatLang) => EmitterSubscription) => {
+  onLocation: (onLocation: (latLng: LatLang) => void): EmitterSubscription => {
     const subscription = eventEmitter.addListener('onLocation', onLocation);
     return subscription;
   },
